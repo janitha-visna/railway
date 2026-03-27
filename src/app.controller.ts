@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 export class AppController {
   @Get()
   getHello(): string {
-    return 'Hello World! 👋 NestJS is running successfully on Railway!';
+    return 'Hello World!';
   }
 
   @Get('health')
