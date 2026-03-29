@@ -2,27 +2,30 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [ main ]   # ✅ Only trigger on main
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Run lint (optional but recommended)
+        run: npm run lint --if-present
 
       - name: Run unit tests
-        run: npm run test
+        run: npm run test --if-present
 
       - name: Build project
         run: npm run build
@@ -30,21 +33,17 @@ jobs:
   deploy-to-railway:
     needs: build-and-test
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Railway CLI
-        run: npm install -g railway
+        run: npm install -g @railway/cli
 
-      - name: Deploy to Railway
+      - name: Deploy to Railway (Production)
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          if [ "${GITHUB_REF}" == "refs/heads/main" ]; then
-            echo "Deploying to Production environment"
-            railway up --environment production --detach
-          elif [ "${GITHUB_REF}" == "refs/heads/development" ]; then
-            echo "Deploying to Development environment"
-            railway up --environment development --detach
-          fi
+          echo "🚀 Deploying to Production environment"
+          railway up --environment production --detach
