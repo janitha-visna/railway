@@ -46,4 +46,4 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           echo "🚀 Deploying to Production environment"
-          railway up --environment production --detach
+          railway up --service railway --environment production --detach
