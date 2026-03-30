@@ -20,13 +20,18 @@ export class S3Service {
   });
 
   async upload(key: string, body: string) {
-    return this.s3.send(
-      new PutObjectCommand({
-        Bucket: process.env.S3_BUCKET,
-        Key: key,
-        Body: body,
-      }),
-    );
+    try {
+      return await this.s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.S3_BUCKET,
+          Key: key,
+          Body: body,
+        }),
+      );
+    } catch (err) {
+      console.error('S3 Upload Error:', err);
+      throw err; // or throw new InternalServerErrorException('Upload failed');
+    }
   }
 
   async list() {
